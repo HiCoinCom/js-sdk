@@ -1,17 +1,29 @@
 {
   "name": "@chainup-custody/js-waas-sdk",
-  "version": "1.0.6",
-  "description": "wallet as a service, chainup custody waas sdk",
+  "version": "2.1.0",
+  "description": "ChainUp Custody SDK - WaaS and MPC API client for Node.js with customizable crypto providers",
   "main": "index.js",
+  "types": "mpc/types/index.d.ts",
   "scripts": {
-    "test": "make test"
+    "test": "mocha test/**/*.test.js",
+    "test:waas": "mocha test/waas-client.test.js",
+    "test:crypto": "mocha test/crypto-provider.test.js"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/HiCoinCom/js-sdk.git"
   },
   "keywords": [
-    "waas"
+    "waas",
+    "mpc",
+    "chainup",
+    "custody",
+    "wallet",
+    "blockchain",
+    "cryptocurrency",
+    "hsm",
+    "kms",
+    "encryption"
   ],
   "author": "Chainup Custody",
   "license": "MIT",
@@ -23,5 +35,8 @@
     "node-rsa": "^1.1.1",
     "request": "^2.88.2",
     "urlsafe-base64": "^1.0.0"
+  },
+  "devDependencies": {
+    "mocha": "^10.8.2"
   }
 }
