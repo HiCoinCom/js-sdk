@@ -57,16 +57,16 @@ const user = await userApi.registerByEmail({
 // 账户操作
 const accountApi = client.getAccountApi();
 const balance = await accountApi.getBalance({
-  userId: user.id,
-  coinType: "BTC",
+  user_id: user.id,
+  coin_type: "BTC",
 });
 
 // 转账操作
 const transferApi = client.getTransferApi();
 const result = await transferApi.transfer({
-  fromUserId: "user1",
-  toUserId: "user2",
-  coinType: "USDT",
+  from_user_id: "user1",
+  to_user_id: "user2",
+  coin_type: "USDT",
   amount: "100.5",
 });
 ```
@@ -88,28 +88,28 @@ const mpcClient = MpcClient.newBuilder()
 // 创建钱包
 const walletApi = mpcClient.getWalletApi();
 const wallet = await walletApi.createWallet({
-  requestId: "unique-request-id",
-  walletName: "My Wallet",
+  request_id: "unique-request-id",
+  wallet_name: "My Wallet",
 });
 
 // 提现（不使用签名）
 const withdrawApi = mpcClient.getWithdrawApi();
 const result1 = await withdrawApi.withdraw({
-  requestId: "unique-request-id",
-  subWalletId: wallet.id,
+  request_id: "unique-request-id",
+  sub_wallet_id: wallet.id,
   symbol: "ETH",
   amount: "0.1",
-  addressTo: "0x123...",
+  address_to: "0x123...",
 });
 
 // 提现（使用签名，增强安全性）
 const result2 = await withdrawApi.withdraw({
-  requestId: "unique-request-id",
-  subWalletId: wallet.id,
+  request_id: "unique-request-id",
+  sub_wallet_id: wallet.id,
   symbol: "ETH",
   amount: "0.1",
-  addressTo: "0x123...",
-  needTransactionSign: true, // 启用交易签名
+  address_to: "0x123...",
+  need_transaction_sign: true, // 启用交易签名
 });
 ```
 
@@ -118,7 +118,7 @@ const result2 = await withdrawApi.withdraw({
 MPC 提现和 Web3 交易支持可选的 RSA 签名功能：
 
 - **配置**: 使用 `setSignPrivateKey()` 设置签名私钥
-- **启用**: 在调用 `withdraw()` 或 `createWeb3Trans()` 时设置 `needTransactionSign: true`
+- **启用**: 在调用 `withdraw()` 或 `createWeb3Trans()` 时设置 `need_transaction_sign: true`
 - **签名规则**:
   - 参数按 ASCII 升序排序
   - 空值不参与签名

@@ -54,16 +54,16 @@ const user = await userApi.registerByEmail({
 // Account operations
 const accountApi = client.getAccountApi();
 const balance = await accountApi.getBalance({
-  userId: user.id,
-  coinType: "BTC",
+  user_id: user.id,
+  coin_type: "BTC",
 });
 
 // Transfer operations
 const transferApi = client.getTransferApi();
 const result = await transferApi.transfer({
-  fromUserId: "user1",
-  toUserId: "user2",
-  coinType: "USDT",
+  from_user_id: "user1",
+  to_user_id: "user2",
+  coin_type: "USDT",
   amount: "100.5",
 });
 ```
@@ -84,24 +84,24 @@ const mpcClient = MpcClient.newBuilder()
 // Create wallet
 const walletApi = mpcClient.getWalletApi();
 const wallet = await walletApi.createWallet({
-  requestId: "unique-request-id",
-  walletName: "My Wallet",
+  request_id: "unique-request-id",
+  wallet_name: "My Wallet",
 });
 
 // Get deposit address
 const depositApi = mpcClient.getDepositApi();
 const address = await depositApi.createAddress({
-  requestId: "unique-request-id",
-  walletId: wallet.id,
-  coinType: "ETH",
+  request_id: "unique-request-id",
+  wallet_id: wallet.id,
+  coin_type: "ETH",
 });
 
 // Withdraw
 const withdrawApi = mpcClient.getWithdrawApi();
 const withdrawal = await withdrawApi.withdraw({
-  requestId: "unique-request-id",
-  walletId: wallet.id,
-  coinType: "ETH",
+  request_id: "unique-request-id",
+  wallet_id: wallet.id,
+  coin_type: "ETH",
   address: "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb",
   amount: "0.1",
 });
