@@ -8,7 +8,7 @@ ChainUp Custody 官方 JavaScript/Node.js SDK - 为数字资产托管提供完�
 
 > 🤖 **AI 开发声明**: 本项目代码由 AI Agent (Claude) 协助完成开发和重构，包括架构设计、代码实现、文档编写等。
 
-[English Documentation](./README_EN.md) | [重构总结](./REFACTORING_SUMMARY.md)
+[English Documentation](./README_EN.md)
 
 ## ✨ 特性
 
