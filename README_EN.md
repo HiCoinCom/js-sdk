@@ -2,8 +2,11 @@
 
 [![npm version](https://badge.fury.io/js/%40chainup-custody%2Fjs-waas-sdk.svg)](https://www.npmjs.com/package/@chainup-custody/js-waas-sdk)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![AI Developed](https://img.shields.io/badge/Developed%20by-AI%20Agent-blueviolet)](https://github.com/anthropics/claude-code)
 
 Official JavaScript/Node.js SDK for [ChainUp Custody](https://custody.chainup.com) - A comprehensive cryptocurrency wallet and custody solution.
+
+> 🤖 **AI Development Notice**: This project was developed and refactored with the assistance of an AI Agent (Claude), including architecture design, code implementation, and documentation.
 
 ## Features
 
@@ -343,6 +346,33 @@ const result = await userApi.registerByEmail({ email: '...' });
 
 - Node.js >= 12.0.0
 - npm or yarn
+
+## Security
+
+### Encryption Mechanism (Aligned with Java SDK)
+
+The SDK uses RSA asymmetric encryption to protect all API communications:
+
+**Request Encryption Flow:**
+
+1. Business params + `time` + `charset` → JSON string
+2. Encrypt with **private key** using RSA segment encryption (234 bytes/block)
+3. Send only `app_id` and `data` (encrypted URL-safe Base64)
+
+**Response Decryption Flow:**
+
+1. Server returns encrypted `data` field
+2. Decrypt with **public key** using RSA segment decryption (256 bytes/block)
+3. Parse JSON to get business data
+
+### Security Features
+
+- ✅ RSA segment encryption/decryption (supports large data)
+- ✅ URL-safe Base64 encoding
+- ✅ Request timestamp for replay protection
+- ✅ Webhook signature verification
+- ✅ Secure key management
+- ✅ Support for custom crypto implementations (HSM, KMS, etc.)
 
 ## Dependencies
 

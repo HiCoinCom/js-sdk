@@ -1,7 +1,7 @@
 {
   "name": "@chainup-custody/js-waas-sdk",
-  "version": "2.1.0",
-  "description": "ChainUp Custody SDK - WaaS and MPC API client for Node.js with customizable crypto providers",
+  "version": "2.1.1",
+  "description": "ChainUp Custody SDK - WaaS and MPC API client for Node.js with customizable crypto providers (aligned with Java SDK)",
   "main": "index.js",
   "types": "mpc/types/index.d.ts",
   "scripts": {

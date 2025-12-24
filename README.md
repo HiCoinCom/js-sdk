@@ -2,8 +2,11 @@
 
 [![npm version](https://badge.fury.io/js/%40chainup-custody%2Fjs-waas-sdk.svg)](https://www.npmjs.com/package/@chainup-custody/js-waas-sdk)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![AI Developed](https://img.shields.io/badge/Developed%20by-AI%20Agent-blueviolet)](https://github.com/anthropics/claude-code)
 
 ChainUp Custody 官方 JavaScript/Node.js SDK - 为数字资产托管提供完整的解决方案。
+
+> 🤖 **AI 开发声明**: 本项目代码由 AI Agent (Claude) 协助完成开发和重构，包括架构设计、代码实现、文档编写等。
 
 [English Documentation](./README_EN.md) | [重构总结](./REFACTORING_SUMMARY.md)
 
@@ -15,6 +18,7 @@ ChainUp Custody 官方 JavaScript/Node.js SDK - 为数字资产托管提供完�
 - 📝 **完整的类型支持** - 全面的 JSDoc 注释
 - ✅ **生产就绪** - 经过企业级环境验证
 - 🚀 **易于集成** - 简单直观的 API
+- 🔒 **与 Java SDK 一致** - 请求/响应加密流程完全对齐
 
 ## 📦 安装
 
@@ -370,8 +374,27 @@ const client = WaasClient.newBuilder()
 
 ## 🔐 安全性
 
-- ✅ RSA 加密通信
-- ✅ 请求签名验证
+### 加密机制（与 Java SDK 一致）
+
+SDK 使用 RSA 非对称加密保护所有 API 通信：
+
+**请求加密流程:**
+
+1. 业务参数 + `time` + `charset` → JSON 字符串
+2. 使用**私钥**进行 RSA 分段加密（234 字节/块）
+3. 只发送 `app_id` 和 `data`（加密后的 URL-safe Base64）
+
+**响应解密流程:**
+
+1. 服务端返回加密的 `data` 字段
+2. 使用**公钥**进行 RSA 分段解密（256 字节/块）
+3. 解析 JSON 获取业务数据
+
+### 安全特性
+
+- ✅ RSA 分段加密/解密（支持大数据）
+- ✅ URL-safe Base64 编码
+- ✅ 请求时间戳防重放
 - ✅ Webhook 签名验证
 - ✅ 安全的密钥管理
 - ✅ 支持自定义加密实现（HSM、KMS 等）
@@ -465,8 +488,8 @@ const result = await userApi.registerByEmail({ email: '...' });
 
 ---
 
-**版本**: 2.0.0  
-**最后更新**: 2024  
+**版本**: 2.1.1  
+**最后更新**: 2025-12-24  
 **维护者**: ChainUp Custody Team
 
 用 ❤️ 构建 by [ChainUp Custody](https://custody.chainup.com)
