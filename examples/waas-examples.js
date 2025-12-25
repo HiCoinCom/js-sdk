@@ -65,6 +65,9 @@ async function runExamples() {
             email: 'test@example.com'
         });
         console.log('Email user info:', JSON.stringify(emailUserInfo, null, 2));
+
+        const userlist = await waasClient.getUserApi().syncUserList({max_id:0});
+        console.log('User list (first 3):', JSON.stringify(userlist?.slice(0, 3), null, 2));
         
         // ==================== Coin API ====================
 
@@ -111,6 +114,9 @@ async function runExamples() {
             address: '0xd4036730fd450237b8fea382bd887c4c96a8453a'
         });
         console.log('Address info:', JSON.stringify(addressInfo, null, 2));
+
+        const addressList = await waasClient.getAccountApi().syncUserAddressList({max_id:0}); 
+        console.log('User address list (first 3):', JSON.stringify(addressList?.slice(0, 3), null, 2)); 
         
 
         // ==================== Billing API ====================
