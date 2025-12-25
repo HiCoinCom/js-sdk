@@ -145,7 +145,7 @@ class Web3Api extends MpcBaseApi {
       requestData.gas_limit = params.gas_limit;
     }
 
-    const response = await this.post('/api/mpc/web3/trans/pending', requestData);
+    const response = await this.post('/api/mpc/web3/pending', requestData);
     return this.validateResponse(response);
   }
 
