@@ -18,56 +18,98 @@ class Web3Api extends MpcBaseApi {
   /**
    * Creates a Web3 transaction
    * @param {Object} params - Transaction parameters
-   * @param {string} params.request_id - Unique request ID
-   * @param {number} params.sub_wallet_id - Sub-wallet ID
-   * @param {string} params.chain_id - Chain ID
-   * @param {string} params.from_addr - From address
-   * @param {string} params.to_addr - To address
-   * @param {string} params.value - Transaction value
-   * @param {string} [params.data] - Transaction data (hex string)
-   * @param {string} [params.gas_price] - Gas price
-   * @param {string} [params.gas_limit] - Gas limit
-   * @param {string} [params.nonce] - Transaction nonce
+   * @param {string} params.request_id - Unique request ID (required)
+   * @param {number} params.sub_wallet_id - Sub-wallet ID (required)
+   * @param {string} params.main_chain_symbol - Main chain coin symbol, e.g. ETH (required)
+   * @param {string} params.interactive_contract - Interactive contract address (required)
+   * @param {string} params.amount - Transfer amount (required)
+   * @param {string} params.gas_price - Gas price in Gwei (required)
+   * @param {string} params.gas_limit - Gas limit (required)
+   * @param {string} params.input_data - Hexadecimal data for contract transaction (required)
+   * @param {string} params.trans_type - Transaction type: 0=Authorization, 1=Other (required)
+   * @param {string} [params.from] - Transaction initiation address (optional, defaults to wallet's commonly used address)
+   * @param {string} [params.dapp_name] - Dapp name (optional)
+   * @param {string} [params.dapp_url] - Dapp URL (optional)
+   * @param {string} [params.dapp_img] - Dapp image (optional)
+   * @param {boolean} [params.need_transaction_sign=false] - Whether transaction signature is required
    * @returns {Promise<Object>} Created transaction result
    * @example
    * const tx = await web3Api.createWeb3Trans({
    *   request_id: 'unique-id',
    *   sub_wallet_id: 123,
-   *   chain_id: '1',
-   *   from_addr: '0x123...',
-   *   to_addr: '0x456...',
-   *   value: '1000000000000000000'
+   *   main_chain_symbol: 'ETH',
+   *   interactive_contract: '0x123...',
+   *   amount: '1000000000000000000',
+   *   gas_price: '20',
+   *   gas_limit: '21000',
+   *   input_data: '0x',
+   *   trans_type: '1'
    * });
    */
   async createWeb3Trans(params) {
-    if (!params.request_id || !params.sub_wallet_id || !params.chain_id || 
-        !params.from_addr || !params.to_addr || !params.value) {
-      throw new Error('Required parameters: request_id, sub_wallet_id, chain_id, from_addr, to_addr, value');
+    // Validate required parameters
+    if (!params.request_id || !params.sub_wallet_id || !params.main_chain_symbol || 
+        !params.interactive_contract || !params.amount || !params.gas_price || 
+        !params.gas_limit || !params.input_data || !params.trans_type) {
+      throw new Error('Required parameters: request_id, sub_wallet_id, main_chain_symbol, interactive_contract, amount, gas_price, gas_limit, input_data, trans_type');
+    }
+
+    const needTransactionSign = params.need_transaction_sign || false;
+
+    // Check if signPrivateKey is configured when signature is required
+    if (needTransactionSign && !this.config.signPrivateKey) {
+      throw new Error('MPC web3 transaction requires signPrivateKey in config when need_transaction_sign is true');
     }
 
     const requestData = {
       request_id: params.request_id,
       sub_wallet_id: params.sub_wallet_id,
-      chain_id: params.chain_id,
-      from_addr: params.from_addr,
-      to_addr: params.to_addr,
-      value: params.value
+      main_chain_symbol: params.main_chain_symbol,
+      interactive_contract: params.interactive_contract,
+      amount: params.amount,
+      gas_price: params.gas_price,
+      gas_limit: params.gas_limit,
+      input_data: params.input_data,
+      trans_type: params.trans_type
     };
 
-    if (params.data) {
-      requestData.data = params.data;
+    // Add optional parameters
+    if (params.from) {
+      requestData.from = params.from;
     }
 
-    if (params.gas_price) {
-      requestData.gas_price = params.gas_price;
+    if (params.dapp_name) {
+      requestData.dapp_name = params.dapp_name;
     }
 
-    if (params.gas_limit) {
-      requestData.gas_limit = params.gas_limit;
+    if (params.dapp_url) {
+      requestData.dapp_url = params.dapp_url;
     }
 
-    if (params.nonce) {
-      requestData.nonce = params.nonce;
+    if (params.dapp_img) {
+      requestData.dapp_img = params.dapp_img;
+    }
+
+    // Generate signature if needed
+    if (needTransactionSign) {
+      const MpcSignUtil = require('../../utils/MpcSignUtil');
+      const sign = MpcSignUtil.generateWeb3Sign(
+        {
+          request_id: params.request_id,
+          sub_wallet_id: params.sub_wallet_id.toString(),
+          main_chain_symbol: params.main_chain_symbol,
+          interactive_contract: params.interactive_contract,
+          amount: params.amount,
+          input_data: params.input_data
+        },
+        this.config.signPrivateKey
+      );
+
+      if (!sign) {
+        throw new Error('Failed to generate web3 transaction signature');
+      }
+  
+      requestData.sign = sign;
     }
 
     const response = await this.post('/api/mpc/web3/trans/create', requestData);
