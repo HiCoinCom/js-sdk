@@ -93,7 +93,7 @@ class WithdrawApi extends MpcBaseApi {
       if (!sign) {
         throw new Error('Failed to generate withdrawal signature');
       }
-
+  
       requestData.sign = sign;
     }
 

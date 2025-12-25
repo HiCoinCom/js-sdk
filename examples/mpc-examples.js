@@ -7,9 +7,9 @@ const { MpcClientFactory } = require('../mpc/MpcClient');
 
 // Configuration
 const config = {
-    appId: '337e0a48',
-    privateKey: `kK150yJiP0LhRC0gaCY2Zf83qTnDFpxm4vrFptdhTwE+gop5vDafuTZwdUDM6xjDJLrzsiz2tXVDBujCYyGEpEcT1AgMBAAECggEBAI4aLBh1uqNKRsYJgk2889f5fWbdXehENk5o0DCYlnhhoQEVdt0ISl6J4m8ArSkkN+pNSq3tC92o7/02+/dLmL51278cQGEVghBMdJfqshBTxZ/tgQODUWqNAnT/KsBFxsLwdVstneBJfN5OFKMXlhs1bSBKOgyVApAtpuyx+TO5nRlIP4HCYZObKXuP2OiRcstC/tU7c6KW/IpakSw2JfTYpWnZZog5Y1nNstXaQV7kGYhKQoC+nrGCi6LPnw3mHw6BAHEQEhWmCKEwvaM4BkoTAwIWhO5cEat17Gra3c2I+1noUZ3iF1Ws1PLqc7LyRb7vZOZpk01PRQoXf/xOS6ECgYEA0c+tYMkmTZ7XCJvDp3DqQZ7O1aYfnHWwbyki+bZexOlhWrrcW/zqRsL3hh2ofAsxgjidu5xm/QCHZZW1N2crm8KnnIDO4oWJsPZy95mOumkvNXzMUsS+X3y4UKlkyLefz5qOWawyFukTTa3d+LOxgKXR7/xFVsKY6I5pmKyNT/kCgYEAzcaeemkGtXQKptyAXrjhoiyVa8I2IJb3YSbTT6ZQYANS8RzK4WN7Ux8Qy8ert0ORwwnpoMzpVrF2yx+jvZ4jDwE3os2RnhAxAMDiGLgLebK2BOCC9XmhrqkBqm5lL2j3yfQe0z9z1WNRybHBk2s/yazoeFamOyLr2KDi/8jWU90CgYEAm5oF323OtmpC1+ONazTWxuvcQZ7+eq7dttMvWTrjde4PgZZrrt0XcntNz21XcwdqJEWQ1X7c8m3d/HzW9MvTD6WBYRQ2WtDmmRNtmCuOKrmvhV+UuR2ognCg0VGPqTxljTX2tJJ8Y3lgE5AKu1OpJNvVosHZOsr/VBmqPsxZ0SECgYEAuM+mDfK938I0vuBTOr95hpncKUfoLSTpUQv5xRNuJI1XtM1TOVKLtH+2Kg9One3FwBHrDkx7VS1Vr+DewrKAcj15pnJSUk/gcvjJF8JULBzhdUfe1nFDUQbhRByaLBZuVac2+CuI8SGelzNa0/gC9jKhJ1NLQNmAULNOrMPIGtECgYEAhxi/1Uxsjkzwp5XXzSMHDsHWZTM/T0XYjl2C3AmBIr2Rmb1/cXTf6W5BvpwJBQzbUtzDOySV1aojVHwiMEOC9BBWlZJ0ziGPrMycweUS75GZ21ccZ2NIsR6V5cFo423Do87CLOqw1H0+sUduPkGfcmqp6oo0RI4+++rgLd+mcCQ=`,
-    waasPublicKey: `/6gZqqEbchjdEQ3OXrQ1UUkXzmwjBrkOSKR8YH2XbxAYAzX21g6qI4TO2YZzpXfhVhqOziaJD/Gyu32WaaceLxR4xniJ6hFcQZSkilTnxf2iJIQ9Zo4oGqhQ/9pY5hPFY0A7oVaa5BD0LD+5g8xVn/ya6NAW1k5tOj50tunIj6S2tR9anMRy4PlAq7HGJGH0OQuLniBVYxXBqOEnkYYDbH/DqcQTNpVYroHnuvCYIzfvCzVeikc1srKePAGALnFXamQtzhbIhIET7Fv5Pjf1X/f2ld1ztF7YlofEa8YnjMzfVp4FxaTNZaK0xQIDAQAB`,
+    appId: '',
+    privateKey: ``,
+    waasPublicKey: ``,
     host: 'https://openapi.chainup.com/',
     debug: false  // Enable debug mode
 };
@@ -20,6 +20,7 @@ const mpcClient = MpcClientFactory.newBuilder()
     .setAppId(config.appId)
     .setRsaPrivateKey(config.privateKey)
     .setWaasPublicKey(config.waasPublicKey)
+    .setSignPrivateKey(config.privateKey)
     .setDebug(config.debug)
     .build();
 
@@ -89,20 +90,21 @@ async function runExamples() {
             address: '0x633A84Ee0ab29d911e5466e5E1CB9cdBf5917E72'
         });
         console.log('Address info:', JSON.stringify(addressInfo, null, 2));
-/* 
+ /* 
         // 9. Withdraw API - Initiate withdrawal
         console.log('\n=== Initiating Withdrawal ===');
         const withdrawal = await mpcClient.getWithdrawApi().withdraw({
             request_id: `withdraw_${Date.now()}`,
             sub_wallet_id: 1000537,
-            symbol: 'SEPOLIA',
-            address_to: '0xdcb0D867403adE76e75a4A6bBcE9D53C9d05B981',
-            amount: '0.01',
-            remark: 'Test withdrawal'
+            symbol: 'DOGE',
+            address_to: 'DKjL5JXqCWF4V7DMRZt3nzr8ckg3nD4VDk',
+            amount: '5',
+            remark: 'Test withdrawal',
+            outputs:`[{\"address_to\":\"DKjL5JXqCWF4V7DMRZt3nzr8ckg3nD4VDk\", \"amount\":\"2\"},{\"address_to\":\"DKjL5JXqCWF4V7DMRZt3nzr8ckg3nD4VDk\", \"amount\":\"3\"}]`,
+            need_transaction_sign: true,
         });
         console.log('Withdrawal result:', JSON.stringify(withdrawal, null, 2));
- */
-
+  */
         
         // 10. Withdraw API - Get withdrawal records
         console.log('\n=== Getting Withdrawal Records ===');
@@ -192,7 +194,7 @@ if (require.main === module) {
     console.log('ChainUp Custody MPC API Examples');
     console.log('=================================');
     
-    //runExamples();
+    runExamples();
 }
 
 module.exports = {

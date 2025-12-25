@@ -24,7 +24,8 @@ class MpcConfig {
     this.rsaPrivateKey = options.rsaPrivateKey ? RSAUtil.formatRSAKey(options.rsaPrivateKey, 'private') : '';
     this.waasPublicKey = options.waasPublicKey ? RSAUtil.formatRSAKey(options.waasPublicKey, 'public') : '';
     this.apiKey = options.apiKey || '';
-    this.signPrivateKey = options.signPrivateKey ? RSAUtil.formatRSAKey(options.signPrivateKey, 'private') : ''; // RSA private key for withdrawal/web3 transaction signing
+    // Use normalizeRSAKey to preserve original key format (PKCS#1 vs PKCS#8) for signing
+    this.signPrivateKey = options.signPrivateKey ? RSAUtil.normalizeRSAKey(options.signPrivateKey, 'private') : '';
     this.cryptoProvider = options.cryptoProvider || null;
     this.debug = options.debug || false;
   }

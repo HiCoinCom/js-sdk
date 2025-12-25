@@ -152,12 +152,24 @@ class MpcSignUtil {
       // Step 1: Generate MD5 hash of the data
       const md5Hash = crypto.createHash('md5').update(signData, 'utf8').digest('hex');
 
-      // Step 2: Sign the MD5 hash using RSA-SHA256
-      const key = new NodeRSA(signPrivateKey, 'pkcs8');
+      // Step 2: Detect key format and load appropriately
+      // PKCS#1: -----BEGIN RSA PRIVATE KEY-----
+      // PKCS#8: -----BEGIN PRIVATE KEY-----
+      let key;
+      if (signPrivateKey.includes('BEGIN RSA PRIVATE KEY')) {
+        // PKCS#1 format
+        key = new NodeRSA(signPrivateKey, 'pkcs1');
+      } else if (signPrivateKey.includes('BEGIN PRIVATE KEY')) {
+        // PKCS#8 format
+        key = new NodeRSA(signPrivateKey, 'pkcs8');
+      } else {
+        // Try auto-detection by NodeRSA
+        key = new NodeRSA(signPrivateKey);
+      }
       key.setOptions({ signingScheme: 'sha256' });
       
+      // Step 3: Sign the MD5 hash with RSA-SHA256
       const signature = key.sign(Buffer.from(md5Hash, 'utf8'), 'base64');
-
       return signature;
     } catch (error) {
       console.error('MPC sign error:', error.message);
