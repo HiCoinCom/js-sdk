@@ -78,6 +78,21 @@ class UserApi extends BaseApi {
     const response = await this.post('/user/info', params);
     return this.validateResponse(response);
   }
+
+  /**
+   * Syncs user list by max ID (pagination)
+   * @param {Object} params - Query parameters
+   * @param {number} params.max_id - Maximum user ID for pagination (0 for first sync)
+   * @returns {Promise<Array>} Synced user list
+   * @example
+   * const users = await userApi.syncUserList({
+   *   max_id: 0
+   * });
+   */
+  async syncUserList(params) {
+    const response = await this.post('/user/syncList', params);
+    return this.validateResponse(response);
+  }
 }
 
 module.exports = UserApi;
