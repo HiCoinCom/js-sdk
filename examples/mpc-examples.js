@@ -76,7 +76,7 @@ async function runExamples() {
             symbol: 'bsc',
             max_id: 0
         });
-        //console.log('Wallet addresses:', JSON.stringify(addresses, null, 2));
+        console.log('Wallet addresses:', JSON.stringify(addresses, null, 2));
 
         // 7. Wallet API - Get wallet assets
         console.log('\n=== Getting Wallet Assets ===');
