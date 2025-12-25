@@ -53,6 +53,12 @@ class TronResourceApi extends MpcBaseApi {
       throw new Error('Required parameter: service_charge_type');
     }
 
+    if (params.buy_type == 0 || params.buy_type == 2) {
+      if (!params.address_to || !params.contract_address) {
+        throw new Error('For buy_type 0 or 2, address_to and contract_address are required');
+      }
+    }
+
     const response = await this.post('/api/mpc/tron/delegate', params);
     return this.validateResponse(response);
   }

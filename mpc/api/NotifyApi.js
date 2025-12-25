@@ -29,7 +29,7 @@ class NotifyApi extends MpcBaseApi {
    *   console.log('Amount:', notifyData.amount);
    * }
    */
-  notifyRequest(cipher) {
+  async notifyRequest(cipher) {
     if (!cipher) {
       if (this.config.debug) {
         console.log('[MpcNotify] Cipher cannot be empty');

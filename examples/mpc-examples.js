@@ -4,12 +4,14 @@
  */
 
 const { MpcClientFactory } = require('../mpc/MpcClient');
+const { sign } = require('../utils/MpcSignUtil');
 
 // Configuration
 const config = {
     appId: '',
     privateKey: ``,
     waasPublicKey: ``,
+    signPrivateKey: ``,
     host: 'https://openapi.chainup.com/',
     debug: false  // Enable debug mode
 };
@@ -20,7 +22,7 @@ const mpcClient = MpcClientFactory.newBuilder()
     .setAppId(config.appId)
     .setRsaPrivateKey(config.privateKey)
     .setWaasPublicKey(config.waasPublicKey)
-    .setSignPrivateKey(config.privateKey)
+    .setSignPrivateKey(config.signPrivateKey) // Optional: for withdrawal/web3 signing
     .setDebug(config.debug)
     .build();
 
@@ -74,7 +76,7 @@ async function runExamples() {
             symbol: 'bsc',
             max_id: 0
         });
-        console.log('Wallet addresses:', JSON.stringify(addresses, null, 2));
+        //console.log('Wallet addresses:', JSON.stringify(addresses, null, 2));
 
         // 7. Wallet API - Get wallet assets
         console.log('\n=== Getting Wallet Assets ===');
@@ -118,21 +120,21 @@ async function runExamples() {
         const syncWithdraw = await mpcClient.getWithdrawApi().syncWithdrawRecords({
             max_id: 0
         });
-        console.log('Synced withdrawals:', JSON.stringify(syncWithdraw, null, 2));
+        //console.log('Synced withdrawals:', JSON.stringify(syncWithdraw, null, 2));
 
         // 12. Deposit API - Get deposit records
         console.log('\n=== Getting Deposit Records ===');
         const depositRecords = await mpcClient.getDepositApi().getDepositRecords({
             ids: [5022457, 456, 789]
         });
-        console.log('Deposit records:', JSON.stringify(depositRecords, null, 2));
+        //console.log('Deposit records:', JSON.stringify(depositRecords, null, 2));
 
         // 13. Deposit API - Sync deposit records
         console.log('\n=== Syncing Deposit Records ===');
         const syncDeposit = await mpcClient.getDepositApi().syncDepositRecords({
             max_id: 0
         });
-        console.log('Synced deposits:', JSON.stringify(syncDeposit, null, 2));
+        //console.log('Synced deposits:', JSON.stringify(syncDeposit, null, 2));
 /* 
         // 14. Web3 API - Create Web3 transaction
         console.log('\n=== Creating Web3 Transaction ===');
@@ -168,21 +170,42 @@ async function runExamples() {
             fueling_limit: '0.01'
         });
         console.log('Auto-sweep configured:', JSON.stringify(sweepConfig, null, 2));
-return
+
         // 18. Auto Sweep API - Sync auto-sweep records
         console.log('\n=== Syncing Auto-Sweep Records ===');
         const sweepRecords = await mpcClient.getAutoSweepApi().syncAutoCollectRecords({
             max_id: 0
         });
-        console.log('Auto-sweep records:', JSON.stringify(sweepRecords, null, 2));
+        //console.log('Auto-sweep records:', JSON.stringify(sweepRecords, null, 2));
 
         
         // 20. Notify API - Decrypt notification
         console.log('\n=== Decrypting Notification ===');
         const notifyApi = mpcClient.getNotifyApi();
-        const encryptedData = 'encrypted_notification_data_here';
-        const decryptedNotify = notifyApi.notifyRequest(encryptedData);
+        const encryptedData = 'Af-uUJj8a2-Og7E5CwzANv4vo8NMf-z-DijwrIuK74Or8eRveM7G_-f0ErtX4WurcVrjdWC-tqU0BDhBwiDijbdyCFBvYB5UmLnHL_Rg13amhQTM-kaHoh-U9WPhYB3vGRwWkTwJ_aETERVVciAvoTf5CalqydMSe8G3KNz-ymrSVUe92DfW5ZdDKJm1hNYYteGJvg0hk--GRiPybPv2W78NlTLyWmXq094megsVzZv-KlsEGPUvPoBnEJ0Xu__AO-l-GfCG4rVO4rb8J01Nq_0Q9eRKcKWq0ci7MfnPPLMhtAWwRvSd3U8PUNHOLqGaJzOLraFnuFUHn90h7T23_DeAduA2W6dto99qb8YQ_iVnMnOKfE0Ls7Vv5S2qhgQJ0nl-BA3PPPOwW37cMb-wTbi3ZezU_S1NQEbrruEChkPhTaK0AqsM6mESV8wGflcWx3N9XPv6QatJ9zedBnkfJ4bJ4Vy2rUEtQF8eVc6zXhV8PuDRiSMf0V0yxzMjE6o9z0s087KSAqFphitlHvQMPJ29FUnyvCe_Czr5WPuhl89GOZjERE2uoNTfHqAlZVzMamoPv4y0qyIjJTufAQm-WwrQK9kGesky7eCiOXVdtR9UhEYpzEJSgXxENjUrHMx6D2AlEzlr17a2DgI-WrWB7oUnyiNnf__ElmLPPkJBdFUfzJByQkLxkUB0FLvTWdVbiIRPmPpdgb7jkhJsHUSOH0NmULqu8bYiEQtGfqRJh8I98qDzHWwfE_VAbqwATj2oD959Fm1eInBqh7eXGoy2WR3o00VpPrNvoE4eJNmw3WpVzlRF7ZVwOpcWRT-dHTShz9mB2Etk9P8D4rGmMZyXHkt4aGUJkE1b3cOEjzkOEFX8CaNe-VHiBYhIyFzMetn7mfIFB0hl565FGEumbhDKNNz_m9T2qPM5k4BQ9fLWUt_WJAVdC81_piIlBOQfYPDbdYoc_9ser1p-Jy5cgTyOMdWuSWC3jMsT09xr8dMcLkKmd39khGidAvGqOOPL1ST0';
+        const decryptedNotify = await notifyApi.notifyRequest(encryptedData);
         console.log('Decrypted notification:', decryptedNotify);
+
+        // tron delegate
+        console.log('\n=== TRON Delegate ===');
+        tronApi = mpcClient.getTronResourceApi()
+        const tronRecord = await tronApi.createTronDelegate({
+            request_id: `12345678901`,
+            resource_type: 1,
+            buy_type: 0,
+            energy_num: 32000,
+            address_from: 'TPjJg9FnzQuYBd6bshgaq7rkH4s36zju5S',
+            address_to: 'TGmBzYfBBtMfFF8v9PweTaPwn3WoB7aGPd',
+            contract_address: 'TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t',
+            service_charge_type: '10010'
+        }); 
+         console.log('tronRecord :', tronRecord);
+
+         console.log('\n=== Get TRON Delegate Records ===');
+         const tronRecords = await tronApi.getBuyResourceRecords(['1234567890']);
+         console.log('Tron delegate records:', JSON.stringify(tronRecords, null, 2));   
+
+         console.log(await tronApi.syncBuyResourceRecords(0));
 
     } catch (error) {
         console.error('Error occurred:', error);
