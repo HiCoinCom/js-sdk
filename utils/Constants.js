@@ -1,3 +1,5 @@
+const RSAUtil = require('./RSAUtil');
+
 exports.DEBUG = false;
 exports.UTF8 = 'utf8';
 
@@ -7,6 +9,19 @@ exports.VER = '/api/v2';
 exports.GET = 'GET';
 exports.POST = 'POST';
 exports.app_id = '';
+
+// RSA keys
+exports.privateKey = '';
+exports.hiCoinPubKey = '';
+
+// Method to set and auto-format keys
+exports.setPrivateKey = function(key) {
+    this.privateKey = key ? RSAUtil.formatRSAKey(key, 'private') : '';
+};
+
+exports.setPublicKey = function(key) {
+    this.hiCoinPubKey = key ? RSAUtil.formatRSAKey(key, 'public') : '';
+};
 
 //User-related operations
 exports.createUser = "/user/createUser";
