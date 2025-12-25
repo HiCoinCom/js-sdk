@@ -474,7 +474,7 @@ const result = await userApi.registerByEmail({ email: '...' });
 
 ## 📞 支持
 
-- **文档**: [https://custody-docs.chainup.com](https://custody-docs.chainup.com)
+- **文档**: [https://custodydocs-zh.chainup.com/api-references/intro/custody-apis](https://custodydocs-zh.chainup.com/api-references/intro/custody-apis)
 - **GitHub Issues**: [https://github.com/HiCoinCom/js-sdk/issues](https://github.com/HiCoinCom/js-sdk/issues)
 - **邮箱**: custody@chainup.com
 

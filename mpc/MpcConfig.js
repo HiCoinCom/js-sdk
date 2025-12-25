@@ -18,7 +18,7 @@ class MpcConfig {
    * @param {boolean} [options.debug=false] - Enable debug mode
    */
   constructor(options = {}) {
-    this.domain = options.domain || '';
+    this.domain = options.domain || 'https://openapi.chainup.com/';
     this.appId = options.appId || '';
     // Auto-format RSA keys to proper PEM format
     this.rsaPrivateKey = options.rsaPrivateKey ? RSAUtil.formatRSAKey(options.rsaPrivateKey, 'private') : '';

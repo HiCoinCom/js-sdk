@@ -386,7 +386,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## Support
 
-- **Documentation**: [https://custody-docs.chainup.com](https://custody-docs.chainup.com)
+- **Documentation**: [https://custodydocs-en.chainup.com/api-references/intro/custody-apis](https://custodydocs-en.chainup.com/api-references/intro/custody-apis)
 - **GitHub Issues**: [https://github.com/HiCoinCom/js-sdk/issues](https://github.com/HiCoinCom/js-sdk/issues)
 - **Email**: custody@chainup.com
 

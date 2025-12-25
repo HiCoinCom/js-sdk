@@ -17,7 +17,7 @@ class WaasConfig {
    * @param {boolean} [options.debug=false] - Enable debug mode
    */
   constructor(options = {}) {
-    this.host = options.host || '';
+    this.host = options.host || 'https://openapi.chainup.com/';
     this.appId = options.appId || '';
     this.privateKey = options.privateKey || '';
     this.publicKey = options.publicKey || '';
