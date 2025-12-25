@@ -38,7 +38,7 @@ class CoinApi extends BaseApi {
    * // - min_deposit: Minimum deposit amount
    */
   async getCoinList(params = {}) {
-    const response = await this.post('/coin/list', params);
+    const response = await this.post('/user/getCoinList', params);
     return this.validateResponse(response);
   }
 }

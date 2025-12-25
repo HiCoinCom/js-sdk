@@ -18,12 +18,12 @@ class UserApi extends BaseApi {
   /**
    * Registers a new user using mobile phone
    * @param {Object} params - Registration parameters
-   * @param {string} params.country - Country code (e.g., '+86')
+   * @param {string} params.country - Country code (e.g., '86')
    * @param {string} params.mobile - Mobile phone number
    * @returns {Promise<Object>} User registration result containing uid
    * @example
    * const result = await userApi.registerMobileUser({
-   *   country: '+86',
+   *   country: '86',
    *   mobile: '13800000000'
    * });
    */
@@ -50,17 +50,17 @@ class UserApi extends BaseApi {
   /**
    * Gets user information by mobile phone
    * @param {Object} params - Query parameters
-   * @param {string} params.country - Country code (e.g., '+86')
+   * @param {string} params.country - Country code (e.g., '86')
    * @param {string} params.mobile - Mobile phone number
    * @returns {Promise<Object>} User information
    * @example
    * const userInfo = await userApi.getMobileUser({
-   *   country: '+86',
+   *   country: '86',
    *   mobile: '13800000000'
    * });
    */
   async getMobileUser(params) {
-    const response = await this.post('/user/getUserInfo', params);
+    const response = await this.post('/user/info', params);
     return this.validateResponse(response);
   }
 
@@ -75,7 +75,7 @@ class UserApi extends BaseApi {
    * });
    */
   async getEmailUser(params) {
-    const response = await this.post('/user/getUserInfo', params);
+    const response = await this.post('/user/info', params);
     return this.validateResponse(response);
   }
 }

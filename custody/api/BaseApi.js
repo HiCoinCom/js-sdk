@@ -168,7 +168,7 @@ class BaseApi {
     }
 
     if (response.code !== 0 && response.code !== '0') {
-      throw new Error(`API Error [${response.code}]: ${response.message || 'Unknown error'}`);
+      throw new Error(`API Error [${response.code}]: ${response.msg || 'Unknown error'}`);
     }
 
     return response.data || response;

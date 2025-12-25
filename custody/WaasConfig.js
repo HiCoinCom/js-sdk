@@ -22,7 +22,7 @@ class WaasConfig {
     this.privateKey = options.privateKey || '';
     this.publicKey = options.publicKey || '';
     this.cryptoProvider = options.cryptoProvider || null;
-    this.version = options.version || 'v1';
+    this.version = options.version || 'v2';
     this.charset = options.charset || 'UTF-8';
     this.debug = options.debug || false;
   }

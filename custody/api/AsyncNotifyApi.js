@@ -26,7 +26,7 @@ class AsyncNotifyApi extends BaseApi {
    *   console.log('Notify type:', notifyData.side); // 'deposit' or 'withdraw'
    * }
    */
-  notifyRequest(cipher) {
+   async notifyRequest(cipher) {
     if (!cipher) {
       if (this.config.debug) {
         console.log('[AsyncNotify] Cipher cannot be empty');
