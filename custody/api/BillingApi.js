@@ -20,11 +20,9 @@ class BillingApi extends BaseApi {
    * @param {Object} params - Withdrawal parameters (WithdrawArgs)
    * @param {string} params.request_id - Unique request ID (merchant generated)
    * @param {number} params.from_uid - Source user ID
-   * @param {string} params.to_address - Destination address
+   * @param {string} params.to_address - Destination address or (address_memo) for some coins
    * @param {string} params.amount - Withdrawal amount
    * @param {string} params.symbol - Cryptocurrency symbol (e.g., 'BTC', 'ETH')
-   * @param {string} [params.memo] - Address memo/tag (for coins like XRP, EOS)
-   * @param {string} [params.remark] - Additional remark
    * @returns {Promise<Object>} Withdrawal result
    * @example
    * const result = await billingApi.withdraw({

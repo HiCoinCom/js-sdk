@@ -130,8 +130,6 @@ async function runExamples() {
             to_address: '0x0f1dc222af5ea2660ff84ae91adc48f1cb2d4991f1e6569dd24d94599c335a06',
             amount: '0.01',
             symbol: 'APTOS',
-            memo: '',
-            remark: 'Test withdrawal'
         });
         console.log('Withdrawal result:', JSON.stringify(withdrawal, null, 2));
         
