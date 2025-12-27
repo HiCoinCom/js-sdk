@@ -45,9 +45,10 @@ class WithdrawApi extends MpcBaseApi {
 
     const needTransactionSign = params.need_transaction_sign || false;
 
-    // Check if signPrivateKey is configured when signature is required
-    if (needTransactionSign && !this.config.signPrivateKey) {
-      throw new Error('MPC withdrawal requires signPrivateKey in config when need_transaction_sign is true');
+    // Check if signPrivateKey or cryptoProvider is configured when signature is required
+    const hasCryptoProviderSign = this.cryptoProvider && typeof this.cryptoProvider.sign === 'function';
+    if (needTransactionSign && !hasCryptoProviderSign && !this.config.signPrivateKey) {
+      throw new Error('MPC withdrawal requires signPrivateKey in config or cryptoProvider with sign method when need_transaction_sign is true');
     }
 
     const requestData = {
@@ -76,19 +77,31 @@ class WithdrawApi extends MpcBaseApi {
 
     // Generate signature if needed
     if (needTransactionSign) {
-      const MpcSignUtil = require('../../utils/MpcSignUtil');
-      const sign = MpcSignUtil.generateWithdrawSign(
-        {
-          request_id: params.request_id,
-          sub_wallet_id: params.sub_wallet_id.toString(),
-          symbol: params.symbol,
-          address_to: params.address_to,
-          amount: params.amount,
-          memo: params.memo || '',
-          outputs: params.outputs || ''
-        },
-        this.config.signPrivateKey
-      );
+      let sign = '';
+      
+      // Prepare sign params for generating signature data
+      const signParams = {
+        request_id: params.request_id,
+        sub_wallet_id: params.sub_wallet_id.toString(),
+        symbol: params.symbol,
+        address_to: params.address_to,
+        amount: params.amount,
+        memo: params.memo || '',
+        outputs: params.outputs || ''
+      };
+
+      // Priority: use cryptoProvider.sign() if available
+      if (this.cryptoProvider && typeof this.cryptoProvider.sign === 'function') {
+        const MpcSignUtil = require('../../utils/MpcSignUtil');
+        const signData = MpcSignUtil.paramsSort(signParams);
+        if (signData) {
+          sign = this.cryptoProvider.sign(signData);
+        }
+      } else if (this.config.signPrivateKey) {
+        // Fallback to MpcSignUtil with config.signPrivateKey
+        const MpcSignUtil = require('../../utils/MpcSignUtil');
+        sign = MpcSignUtil.generateWithdrawSign(signParams, this.config.signPrivateKey);
+      }
 
       if (!sign) {
         throw new Error('Failed to generate withdrawal signature');

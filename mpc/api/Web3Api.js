@@ -56,9 +56,10 @@ class Web3Api extends MpcBaseApi {
 
     const needTransactionSign = params.need_transaction_sign || false;
 
-    // Check if signPrivateKey is configured when signature is required
-    if (needTransactionSign && !this.config.signPrivateKey) {
-      throw new Error('MPC web3 transaction requires signPrivateKey in config when need_transaction_sign is true');
+    // Check if signPrivateKey or cryptoProvider is configured when signature is required
+    const hasCryptoProviderSign = this.cryptoProvider && typeof this.cryptoProvider.sign === 'function';
+    if (needTransactionSign && !hasCryptoProviderSign && !this.config.signPrivateKey) {
+      throw new Error('MPC web3 transaction requires signPrivateKey in config or cryptoProvider with sign method when need_transaction_sign is true');
     }
 
     const requestData = {
@@ -92,18 +93,30 @@ class Web3Api extends MpcBaseApi {
 
     // Generate signature if needed
     if (needTransactionSign) {
-      const MpcSignUtil = require('../../utils/MpcSignUtil');
-      const sign = MpcSignUtil.generateWeb3Sign(
-        {
-          request_id: params.request_id,
-          sub_wallet_id: params.sub_wallet_id.toString(),
-          main_chain_symbol: params.main_chain_symbol,
-          interactive_contract: params.interactive_contract,
-          amount: params.amount,
-          input_data: params.input_data
-        },
-        this.config.signPrivateKey
-      );
+      let sign = '';
+
+      // Prepare sign params for generating signature data
+      const signParams = {
+        request_id: params.request_id,
+        sub_wallet_id: params.sub_wallet_id.toString(),
+        main_chain_symbol: params.main_chain_symbol,
+        interactive_contract: params.interactive_contract,
+        amount: params.amount,
+        input_data: params.input_data
+      };
+
+      // Priority: use cryptoProvider.sign() if available
+      if (this.cryptoProvider && typeof this.cryptoProvider.sign === 'function') {
+        const MpcSignUtil = require('../../utils/MpcSignUtil');
+        const signData = MpcSignUtil.paramsSort(signParams);
+        if (signData) {
+          sign = this.cryptoProvider.sign(signData);
+        }
+      } else if (this.config.signPrivateKey) {
+        // Fallback to MpcSignUtil with config.signPrivateKey
+        const MpcSignUtil = require('../../utils/MpcSignUtil');
+        sign = MpcSignUtil.generateWeb3Sign(signParams, this.config.signPrivateKey);
+      }
 
       if (!sign) {
         throw new Error('Failed to generate web3 transaction signature');

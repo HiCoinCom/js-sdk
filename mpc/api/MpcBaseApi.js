@@ -26,6 +26,7 @@ class MpcBaseApi {
       this.cryptoProvider = new RsaCryptoProvider({
         privateKey: config.rsaPrivateKey,
         publicKey: config.waasPublicKey || '', // WaaS server public key for decryption
+        signPrivateKey: config.signPrivateKey || '', // Private key for signing transactions
         charset: 'UTF-8'
       });
     }

@@ -92,21 +92,21 @@ async function runExamples() {
             address: '0x633A84Ee0ab29d911e5466e5E1CB9cdBf5917E72'
         });
         console.log('Address info:', JSON.stringify(addressInfo, null, 2));
- /* 
+  
         // 9. Withdraw API - Initiate withdrawal
         console.log('\n=== Initiating Withdrawal ===');
         const withdrawal = await mpcClient.getWithdrawApi().withdraw({
-            request_id: `withdraw_${Date.now()}`,
+            request_id: `123456789023`,
             sub_wallet_id: 1000537,
-            symbol: 'DOGE',
-            address_to: 'DKjL5JXqCWF4V7DMRZt3nzr8ckg3nD4VDk',
-            amount: '5',
+            symbol: 'Sepolia',
+            address_to: '0xdcb0D867403adE76e75a4A6bBcE9D53C9d05B981',
+            amount: '0.001',
             remark: 'Test withdrawal',
-            outputs:`[{\"address_to\":\"DKjL5JXqCWF4V7DMRZt3nzr8ckg3nD4VDk\", \"amount\":\"2\"},{\"address_to\":\"DKjL5JXqCWF4V7DMRZt3nzr8ckg3nD4VDk\", \"amount\":\"3\"}]`,
+            outputs:``,
             need_transaction_sign: true,
         });
         console.log('Withdrawal result:', JSON.stringify(withdrawal, null, 2));
-  */
+  
         
         // 10. Withdraw API - Get withdrawal records
         console.log('\n=== Getting Withdrawal Records ===');

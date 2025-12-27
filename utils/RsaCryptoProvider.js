@@ -7,6 +7,7 @@
  * @implements {ICryptoProvider}
  */
 const crypto = require('crypto');
+const NodeRSA = require('node-rsa');
 const ICryptoProvider = require('./ICryptoProvider');
 const RSAUtil = require('./RSAUtil');
 
@@ -22,6 +23,7 @@ class RsaCryptoProvider extends ICryptoProvider {
    * @param {Object} options - Configuration options
    * @param {string} options.privateKey - RSA private key in PEM format
    * @param {string} options.publicKey - RSA public key in PEM format
+   * @param {string} [options.signPrivateKey] - RSA private key for signing (optional, defaults to privateKey)
    * @param {string} [options.charset='UTF-8'] - Character encoding
    */
   constructor(options) {
@@ -30,6 +32,24 @@ class RsaCryptoProvider extends ICryptoProvider {
     this.privateKey = options.privateKey ? RSAUtil.formatRSAKey(options.privateKey, 'private') : '';
     this.publicKey = options.publicKey ? RSAUtil.formatRSAKey(options.publicKey, 'public') : '';
     this.charset = options.charset || 'UTF-8';
+    
+    // Pre-initialize NodeRSA key for signing to avoid repeated key parsing
+    // signPrivateKey for transaction signing, defaults to privateKey if not provided
+    this._signKey = null;
+    const signKeySource = options.signPrivateKey || options.privateKey;
+    if (signKeySource) {
+      // Use preserveFormat=true to keep original key format (PKCS#1 or PKCS#8)
+      const formattedSignKey = RSAUtil.formatRSAKey(signKeySource, 'private', true);
+      // Detect format from header
+      if (formattedSignKey.includes('BEGIN RSA PRIVATE KEY')) {
+        this._signKey = new NodeRSA(formattedSignKey, 'pkcs1-private-pem');
+      } else if (formattedSignKey.includes('BEGIN PRIVATE KEY')) {
+        this._signKey = new NodeRSA(formattedSignKey, 'pkcs8-private-pem');
+      } else {
+        this._signKey = new NodeRSA(formattedSignKey);
+      }
+      this._signKey.setOptions({ signingScheme: 'sha256' });
+    }
   }
 
   /**
@@ -127,6 +147,33 @@ class RsaCryptoProvider extends ICryptoProvider {
       return combinedBuffer.toString('utf-8');
     } catch (error) {
       throw new Error(`Failed to decrypt with public key: ${error.message}`);
+    }
+  }
+
+  /**
+   * Signs data using RSA private key with SHA256
+   * Process matches MpcSignUtil.sign():
+   * 1. Generate MD5 hash of the data
+   * 2. Sign the MD5 hash with RSA-SHA256
+   * 3. Return Base64 encoded signature
+   * Uses pre-initialized _signKey (from signPrivateKey or privateKey)
+   * @param {string} signData - Data to sign (typically sorted parameters string)
+   * @returns {string} Base64 encoded signature
+   */
+  sign(signData) {
+    if (!signData || !this._signKey) {
+      return '';
+    }
+
+    try {
+      // Step 1: Generate MD5 hash of the data
+      const md5Hash = crypto.createHash('md5').update(signData, 'utf8').digest('hex');
+
+      // Step 2: Sign the MD5 hash with RSA-SHA256 using pre-initialized key
+      const signature = this._signKey.sign(Buffer.from(md5Hash, 'utf8'), 'base64');
+      return signature;
+    } catch (error) {
+      throw new Error(`Failed to sign data: ${error.message}`);
     }
   }
 }
