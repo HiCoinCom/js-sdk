@@ -4,9 +4,13 @@
  * Implements the same request format as Java SDK:
  * - Request params: app_id + data (encrypted with private key)
  * - Response data: encrypted with private key, decrypt with public key
+ * Uses Node.js built-in https/http modules (no deprecated dependencies)
  * @class MpcHttpClient
  */
-const request = require('request');
+const https = require('https');
+const http = require('http');
+const { URL } = require('url');
+const querystring = require('querystring');
 
 class MpcHttpClient {
   /**
@@ -29,7 +33,7 @@ class MpcHttpClient {
   async request(options) {
     const { method, path, encryptedData } = options;
 
-    const url = this.config.getUrl(path);
+    let url = this.config.getUrl(path);
 
     // Only two parameters: app_id and data (encrypted)
     // This matches Java SDK: Args params = new Args(this.cfg.getAppId(), data);
@@ -38,18 +42,31 @@ class MpcHttpClient {
       data: encryptedData
     };
 
+    // For GET requests, append query string
+    if (method === 'GET') {
+      const queryStr = querystring.stringify(params);
+      url = url + (url.includes('?') ? '&' : '?') + queryStr;
+    }
+
+    const parsedUrl = new URL(url);
+    const isHttps = parsedUrl.protocol === 'https:';
+    const transport = isHttps ? https : http;
+
     const requestOptions = {
       method,
-      url,
+      hostname: parsedUrl.hostname,
+      port: parsedUrl.port || (isHttps ? 443 : 80),
+      path: parsedUrl.pathname + parsedUrl.search,
       headers: {},
       timeout: 30000, // 30 seconds timeout
     };
 
+    // Prepare POST body
+    let postData = '';
     if (method === 'POST') {
-      // Use form submission (application/x-www-form-urlencoded)
-      requestOptions.form = params;
-    } else if (method === 'GET') {
-      requestOptions.qs = params;
+      postData = querystring.stringify(params);
+      requestOptions.headers['Content-Type'] = 'application/x-www-form-urlencoded';
+      requestOptions.headers['Content-Length'] = Buffer.byteLength(postData);
     }
 
     if (this.config.debug) {
@@ -64,29 +81,48 @@ class MpcHttpClient {
     }
 
     return new Promise((resolve, reject) => {
-      request(requestOptions, (error, response, body) => {
-        if (error) {
-          reject(new Error(`MPC HTTP request failed: ${error.message}`));
-          return;
-        }
+      const req = transport.request(requestOptions, (response) => {
+        let body = '';
+        
+        response.on('data', (chunk) => {
+          body += chunk;
+        });
+        
+        response.on('end', () => {
+          if (response.statusCode !== 200) {
+            reject(new Error(`MPC HTTP ${response.statusCode}: ${body}`));
+            return;
+          }
 
-        if (response.statusCode !== 200) {
-          reject(new Error(`MPC HTTP ${response.statusCode}: ${body}`));
-          return;
-        }
+          if (this.config.debug) {
+            console.log('[MPC HTTP Response]:', body);
+          }
 
-        if (this.config.debug) {
-          console.log('[MPC HTTP Response]:', body);
-        }
-
-        // Parse JSON response
-        try {
-          const jsonResponse = typeof body === 'string' ? JSON.parse(body) : body;
-          resolve(jsonResponse);
-        } catch (e) {
-          reject(new Error(`Failed to parse MPC response: ${e.message}`));
-        }
+          // Parse JSON response
+          try {
+            const jsonResponse = typeof body === 'string' ? JSON.parse(body) : body;
+            resolve(jsonResponse);
+          } catch (e) {
+            reject(new Error(`Failed to parse MPC response: ${e.message}`));
+          }
+        });
       });
+
+      req.on('error', (error) => {
+        reject(new Error(`MPC HTTP request failed: ${error.message}`));
+      });
+
+      req.on('timeout', () => {
+        req.destroy();
+        reject(new Error('MPC HTTP request timeout'));
+      });
+
+      // Send POST data
+      if (method === 'POST' && postData) {
+        req.write(postData);
+      }
+      
+      req.end();
     });
   }
 

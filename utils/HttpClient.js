@@ -2,9 +2,13 @@
  * HTTP Client Class
  * Handles HTTP communication with the WaaS API
  * Provides methods for making HTTP requests with proper error handling
+ * Uses Node.js built-in https/http modules (no deprecated dependencies)
  * @class HttpClient
  */
-const request = require('request');
+const https = require('https');
+const http = require('http');
+const { URL } = require('url');
+const querystring = require('querystring');
 
 class HttpClient {
   /**
@@ -27,11 +31,23 @@ class HttpClient {
   async request(options) {
     const { method, path, data = {}, headers = {} } = options;
 
-    const url = this.config.getUrl(path);
+    let url = this.config.getUrl(path);
+    
+    // For GET requests, append query string
+    if (method === 'GET' && Object.keys(data).length > 0) {
+      const queryStr = querystring.stringify(data);
+      url = url + (url.includes('?') ? '&' : '?') + queryStr;
+    }
+
+    const parsedUrl = new URL(url);
+    const isHttps = parsedUrl.protocol === 'https:';
+    const transport = isHttps ? https : http;
 
     const requestOptions = {
       method,
-      url,
+      hostname: parsedUrl.hostname,
+      port: parsedUrl.port || (isHttps ? 443 : 80),
+      path: parsedUrl.pathname + parsedUrl.search,
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
         ...headers,
@@ -39,11 +55,11 @@ class HttpClient {
       timeout: 30000, // 30 seconds timeout
     };
 
-    // Set form data for POST requests
+    // Prepare POST body
+    let postData = '';
     if (method === 'POST') {
-      requestOptions.form = data;
-    } else if (method === 'GET') {
-      requestOptions.qs = data;
+      postData = querystring.stringify(data);
+      requestOptions.headers['Content-Length'] = Buffer.byteLength(postData);
     }
 
     if (this.config.debug) {
@@ -55,23 +71,42 @@ class HttpClient {
     }
 
     return new Promise((resolve, reject) => {
-      request(requestOptions, (error, response, body) => {
-        if (error) {
-          reject(new Error(`HTTP request failed: ${error.message}`));
-          return;
-        }
+      const req = transport.request(requestOptions, (response) => {
+        let body = '';
+        
+        response.on('data', (chunk) => {
+          body += chunk;
+        });
+        
+        response.on('end', () => {
+          if (response.statusCode !== 200) {
+            reject(new Error(`HTTP ${response.statusCode}: ${body}`));
+            return;
+          }
 
-        if (response.statusCode !== 200) {
-          reject(new Error(`HTTP ${response.statusCode}: ${body}`));
-          return;
-        }
+          if (this.config.debug) {
+            console.log('[HTTP Response]:', body);
+          }
 
-        if (this.config.debug) {
-          console.log('[HTTP Response]:', body);
-        }
-
-        resolve(body);
+          resolve(body);
+        });
       });
+
+      req.on('error', (error) => {
+        reject(new Error(`HTTP request failed: ${error.message}`));
+      });
+
+      req.on('timeout', () => {
+        req.destroy();
+        reject(new Error('HTTP request timeout'));
+      });
+
+      // Send POST data
+      if (method === 'POST' && postData) {
+        req.write(postData);
+      }
+      
+      req.end();
     });
   }
 

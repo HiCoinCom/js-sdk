@@ -22,14 +22,28 @@ ChainUp Custody 官方 JavaScript/Node.js SDK - 为数字资产托管提供完�
 
 ## 📦 安装
 
+### 从 GitHub 安装
+
+直接从 GitHub 仓库的 main 分支安装最新版本：
+
 ```bash
-npm install @chainup-custody/js-waas-sdk
+npm install github:HiCoinCom/js-sdk#main
 ```
 
-或使用 yarn:
+或使用完整 URL 格式：
 
 ```bash
-yarn add @chainup-custody/js-waas-sdk
+npm install https://github.com/HiCoinCom/js-sdk#main
+```
+
+安装后，`package.json` 中会显示：
+
+```json
+{
+  "dependencies": {
+    "@chainup-custody/js-waas-sdk": "github:HiCoinCom/js-sdk#main"
+  }
+}
 ```
 
 ## 🚀 快速开始
@@ -41,7 +55,6 @@ const { WaasClient } = require("@chainup-custody/js-waas-sdk");
 
 // 使用 Builder 模式创建 WaaS 客户端
 const client = WaasClient.newBuilder()
-  .setHost("https://api.custody.chainup.com")
   .setAppId("your-app-id")
   .setPrivateKey("-----BEGIN PRIVATE KEY-----\n...")
   .setPublicKey("-----BEGIN PUBLIC KEY-----\n...")
@@ -80,8 +93,7 @@ const { MpcClient } = require("@chainup-custody/js-waas-sdk");
 const mpcClient = MpcClient.newBuilder()
   .setAppId("your-app-id")
   .setRsaPrivateKey("-----BEGIN PRIVATE KEY-----\n...")
-  .setApiKey("your-api-key")
-  .setDomain("https://mpc-api.custody.chainup.com")
+  .setWaasPublicKey("ChainUp Rsa Public Key")
   .setSignPrivateKey("-----BEGIN PRIVATE KEY-----\n...") // 可选：用于提现/Web3交易签名
   .build();
 
@@ -162,7 +174,6 @@ class MyCustomCryptoProvider extends ICryptoProvider {
 
 // 使用自定义加密提供者
 const client = WaasClient.newBuilder()
-  .setHost("https://api.custody.chainup.com")
   .setAppId("your-app-id")
   .setCryptoProvider(new MyCustomCryptoProvider(myHsmClient))
   .build();
@@ -346,13 +357,13 @@ app.post('/webhook/waas/verify', async (req, res) => {
 
 ```bash
 # WaaS 配置
-WAAS_HOST=https://api.custody.chainup.com
+WAAS_HOST=
 WAAS_APP_ID=your-app-id
 WAAS_PRIVATE_KEY=your-private-key
 WAAS_PUBLIC_KEY=chainup-public-key
 
 # MPC 配置
-MPC_DOMAIN=https://mpc-api.custody.chainup.com
+MPC_DOMAIN=
 MPC_APP_ID=your-mpc-app-id
 MPC_API_KEY=your-api-key
 MPC_PRIVATE_KEY=your-mpc-private-key
@@ -420,9 +431,7 @@ npm test -- test/crypto-provider.test.js
 ## 📖 文档
 
 - [English README](./README_EN.md) - 完整的英文文档
-- [重构总结](./REFACTORING_SUMMARY.md) - 架构和设计说明
-- [API 文档](https://custody-docs.chainup.com) - 官方 API 文档
-- [JSDoc 注释](./custody/api/) - 代码内联文档
+- [API 文档](https://custodydocs-zh.chainup.com/introduction/overview/chainup-custody) - 官方 API 文档
 
 ## 🔄 从 v1.x 迁移
 
@@ -454,8 +463,6 @@ const result = await userApi.registerByEmail({ email: '...' });
 - **Singleton 模式** - 资源复用
 - **Dependency Injection** - 加密提供者解耦
 - **Interface Segregation** - ICryptoProvider 接口抽象
-
-详细说明请参考 [重构总结](./REFACTORING_SUMMARY.md)。
 
 ## 📋 系统要求
 

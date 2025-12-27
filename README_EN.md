@@ -19,14 +19,28 @@ Official JavaScript/Node.js SDK for [ChainUp Custody](https://custody.chainup.co
 
 ## Installation
 
+### From GitHub
+
+Install the latest version directly from the main branch of the GitHub repository:
+
 ```bash
-npm install @chainup-custody/js-waas-sdk
+npm install github:HiCoinCom/js-sdk#main
 ```
 
-Or using yarn:
+Or using the full URL format:
 
 ```bash
-yarn add @chainup-custody/js-waas-sdk
+npm install https://github.com/HiCoinCom/js-sdk#main
+```
+
+After installation, your `package.json` will show:
+
+```json
+{
+  "dependencies": {
+    "@chainup-custody/js-waas-sdk": "github:HiCoinCom/js-sdk#main"
+  }
+}
 ```
 
 ## Quick Start
@@ -38,7 +52,6 @@ const { WaasClient } = require("@chainup-custody/js-waas-sdk");
 
 // Create WaaS client using Builder pattern
 const client = WaasClient.newBuilder()
-  .setHost("https://api.custody.chainup.com")
   .setAppId("your-app-id")
   .setPrivateKey("-----BEGIN PRIVATE KEY-----\n...")
   .setPublicKey("-----BEGIN PUBLIC KEY-----\n...")
@@ -77,8 +90,7 @@ const { MpcClient } = require("@chainup-custody/js-waas-sdk");
 const mpcClient = MpcClient.newBuilder()
   .setAppId("your-app-id")
   .setRsaPrivateKey("-----BEGIN PRIVATE KEY-----\n...")
-  .setApiKey("your-api-key")
-  .setDomain("https://mpc-api.custody.chainup.com")
+  .setWaasPublicKey("ChainUp Rsa Public Key")
   .build();
 
 // Create wallet
@@ -217,13 +229,13 @@ You can use environment variables for configuration:
 
 ```bash
 # WaaS Configuration
-WAAS_HOST=https://api.custody.chainup.com
+WAAS_HOST=
 WAAS_APP_ID=your-app-id
 WAAS_PRIVATE_KEY=your-private-key
 WAAS_PUBLIC_KEY=chainup-public-key
 
 # MPC Configuration
-MPC_DOMAIN=https://mpc-api.custody.chainup.com
+MPC_DOMAIN=
 MPC_APP_ID=your-mpc-app-id
 MPC_API_KEY=your-api-key
 MPC_PRIVATE_KEY=your-mpc-private-key
@@ -393,10 +405,6 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Changelog
-
-See [CHANGELOG.md](CHANGELOG.md) for version history and updates.
 
 ---
 
