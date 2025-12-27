@@ -1,0 +1,39 @@
+# Development files
+test/
+scripts/
+examples/
+
+# Documentation (keep README)
+docs/
+*.old.md
+COMPLETION_SUMMARY.md
+PROJECT_STATUS.md
+PROJECT.md
+QUICK_REFERENCE.md
+REFACTORING_SUMMARY.md
+CHANGELOG.md
+
+# Git files
+.git/
+.gitignore
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# NPM files
+node_modules/
+package-lock.json
+npm-debug.log*
+
+# Build artifacts
+*.log
+coverage/
+.nyc_output/
