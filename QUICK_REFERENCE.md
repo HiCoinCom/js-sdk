@@ -169,8 +169,9 @@ await web3Api.createWeb3Trans({
 
 // 加速交易
 await web3Api.accelerationWeb3Trans({
-  request_id: "original-id",
-  gas_price: "50000000000",
+  trans_id: 12345,
+  gas_price: "50",
+  gas_limit: "21000",
 });
 ```
 

@@ -196,9 +196,9 @@ const web3Tx = await mpcClient.getWeb3Api().createWeb3Trans({
 // 加速交易（如果 gas 费不够）
 if (web3Tx.status === "pending") {
   await mpcClient.getWeb3Api().accelerationWeb3Trans({
-    sub_wallet_id: 123456,
-    request_id: web3Tx.request_id,
-    fee: "0.001", // 新的矿工费
+    trans_id: web3Tx.id, // Web3 交易 ID
+    gas_price: "50", // Gas 费用，单位：Gwei
+    gas_limit: "21000", // Gas limit
   });
 }
 ```

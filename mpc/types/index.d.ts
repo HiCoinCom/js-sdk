@@ -278,9 +278,12 @@ declare module '@chainup-custody/js-waas-sdk' {
   }
 
   export interface AccelerateWeb3TransParams {
-    request_id: string;
+    /** Web3 transaction ID (required) */
+    trans_id: number;
+    /** Gas fee, unit: Gwei (required) */
     gas_price: string;
-    gas_limit?: string;
+    /** Gas limit fee (required) */
+    gas_limit: string;
   }
 
   export interface Web3Record {

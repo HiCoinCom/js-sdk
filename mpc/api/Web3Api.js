@@ -134,29 +134,27 @@ class Web3Api extends MpcBaseApi {
    * When a transfer is signed but has not been confirmed on the blockchain for a long time 
    * due to insufficient fees, it can be accelerated by specifying a higher fee
    * @param {Object} params - Acceleration parameters
-   * @param {string} params.request_id - Original request ID
-   * @param {string} params.gas_price - New gas price (higher than original)
-   * @param {string} [params.gas_limit] - New gas limit (optional)
+   * @param {number} params.trans_id - Web3 transaction ID (required)
+   * @param {string} params.gas_price - Gas fee, unit: Gwei (required)
+   * @param {string} params.gas_limit - Gas limit fee (required)
    * @returns {Promise<boolean>} Acceleration result
    * @example
    * const result = await web3Api.accelerationWeb3Trans({
-   *   request_id: 'original-request-id',
-   *   gas_price: '20000000000'
+   *   trans_id: 12345,
+   *   gas_price: '50',
+   *   gas_limit: '21000'
    * });
    */
   async accelerationWeb3Trans(params) {
-    if (!params.request_id || !params.gas_price) {
-      throw new Error('Required parameters: request_id, gas_price');
+    if (!params.trans_id || !params.gas_price || !params.gas_limit) {
+      throw new Error('Required parameters: trans_id, gas_price, gas_limit');
     }
 
     const requestData = {
-      request_id: params.request_id,
-      gas_price: params.gas_price
+      trans_id: params.trans_id,
+      gas_price: params.gas_price,
+      gas_limit: params.gas_limit
     };
-
-    if (params.gas_limit) {
-      requestData.gas_limit = params.gas_limit;
-    }
 
     const response = await this.post('/api/mpc/web3/pending', requestData);
     return this.validateResponse(response);
