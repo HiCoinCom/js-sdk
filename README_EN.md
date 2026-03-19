@@ -37,6 +37,7 @@ After installation, your `package.json` will show:
 
 ```json
 {
+  "type": "module",
   "dependencies": {
     "@chainup-custody/js-waas-sdk": "github:HiCoinCom/js-sdk#main"
   }
