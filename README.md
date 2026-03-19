@@ -40,6 +40,7 @@ npm install https://github.com/HiCoinCom/js-sdk#main
 
 ```json
 {
+  "type": "module",
   "dependencies": {
     "@chainup-custody/js-waas-sdk": "github:HiCoinCom/js-sdk#main"
   }
