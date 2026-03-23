@@ -158,6 +158,9 @@ class Builder {
    */
   setRsaPrivateKey(rsaPrivateKey) {
     this.options.rsaPrivateKey = rsaPrivateKey;
+    if (!this.options.signPrivateKey) {
+        this.options.signPrivateKey = rsaPrivateKey;
+    }
     return this;
   }
 
